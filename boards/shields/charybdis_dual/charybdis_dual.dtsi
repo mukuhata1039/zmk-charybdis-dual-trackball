@@ -1,0 +1,23 @@
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+    default_transform: keymap_transform_0 {
+        compatible = "zmk,matrix-transform";
+        columns = <2>;
+        rows = <1>;
+
+        map = <
+            RC(0,0) RC(0,1)
+        >;
+    };
+
+    physical_layout0: physical_layout_0 {
+        compatible = "zmk,physical-layout";
+        display-name = "Bringup Layout";
+        transform = <&default_transform>;
+    };
+
+    chosen {
+        zmk,physical-layout = &physical_layout0;
+    };
+};
