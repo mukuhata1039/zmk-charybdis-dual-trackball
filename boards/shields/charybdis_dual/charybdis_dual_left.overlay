@@ -8,10 +8,11 @@
     };
 
     kscan0: kscan_0 {
-        compatible = "zmk,kscan-gpio-direct";
-        wakeup-source;
+        compatible = "zmk,kscan-gpio-charlieplex";
 
-        input-gpios =
-            <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        gpios =
+            <&xiao_d 0 GPIO_ACTIVE_HIGH>,
+            <&xiao_d 1 GPIO_ACTIVE_HIGH>,
+            <&xiao_d 2 GPIO_ACTIVE_HIGH>;
     };
 };
