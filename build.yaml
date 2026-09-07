@@ -8,12 +8,3 @@ include:
     shield: charybdis_dual_left
     cmake-args: -DCONFIG_ZMK_SPLIT=y -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
     artifact-name: charybdis_left
-
-  - board: xiao_ble//zmk
-    shield: charybdis_dual_right
-    cmake-args: -DCONFIG_ZMK_SPLIT=y -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
-    artifact-name: charybdis_right
-
-  - board: xiao_ble//zmk
-    shield: settings_reset
-    artifact-name: settings_reset
