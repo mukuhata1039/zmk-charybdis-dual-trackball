@@ -3,17 +3,19 @@
 / {
     default_transform: keymap_transform_0 {
         compatible = "zmk,matrix-transform";
-        columns = <2>;
-        rows = <1>;
+        columns = <3>;
+        rows = <3>;
 
         map = <
-            RC(0,0) RC(0,1)
+            RC(0,1) RC(0,2)
+            RC(1,0) RC(1,2)
+            RC(2,0) RC(2,1)
         >;
     };
 
     physical_layout0: physical_layout_0 {
         compatible = "zmk,physical-layout";
-        display-name = "Bringup Layout";
+        display-name = "Charlieplex Test";
         transform = <&default_transform>;
     };
 
