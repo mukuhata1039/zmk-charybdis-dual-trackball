@@ -1,5 +1,13 @@
 ---
 include:
   - board: xiao_ble//zmk
-    shield: tester_xiao
-    artifact-name: xiao_test
+    shield: charybdis_dual_dongle
+    artifact-name: charybdis_dongle
+
+  - board: xiao_ble//zmk
+    shield: charybdis_dual_left
+    artifact-name: charybdis_left
+
+  - board: xiao_ble//zmk
+    shield: charybdis_dual_right
+    artifact-name: charybdis_right
