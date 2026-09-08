@@ -28,3 +28,16 @@
 &default_transform {
     col-offset = <3>;
 };
+
+/*
+ * 右側スクロールホイール。
+ *
+ * charybdis_dual.dtsi にあるEC11定義を
+ * 右XIAOでも有効化する。
+ *
+ * D4 = A
+ * D5 = B
+ */
+&left_encoder {
+    status = "okay";
+};
