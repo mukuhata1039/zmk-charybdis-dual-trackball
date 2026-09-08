@@ -2,15 +2,37 @@
 
 #include <zephyr/dt-bindings/gpio/gpio.h>
 
+/*
+ * XIAO nRF52840:
+ *
+ * D4 = P0.4
+ * D5 = P0.5
+ *
+ * EC11のEDGE_BOTH割り込みを
+ * nRF52840 GPIO SENSEへ回す。
+ */
+&gpio0 {
+    sense-edge-mask = <0x30>;
+};
+
+/*
+ * D4/D5をEC11専用として使用するため
+ * I2C1を無効化。
+ */
+&i2c1 {
+    status = "disabled";
+};
+
 / {
     chosen {
         zmk,kscan = &kscan0;
     };
 
     /*
-     * 通常のキー入力
-     * D0 / D1 / D2 = Charlieplex
-     * D3 = Wake用interrupt
+     * キー用Charlieplex
+     *
+     * D0 / D1 / D2 = Matrix
+     * D3 = Key Wake Interrupt
      */
     kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-charlieplex";
@@ -24,47 +46,17 @@
         interrupt-gpios =
             <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
     };
-
-    /*
-     * エンコーダー起床専用
-     *
-     * Encoder A/B
-     *    ↓ ダイオードで合流
-     * D6
-     */
-    encoder_wakeup_scan: encoder_wakeup_scan {
-        compatible = "zmk,kscan-gpio-direct";
-        wakeup-source;
-
-        input-gpios =
-            <&xiao_d 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-    };
-
-    /*
-     * D6は通常キーとして使わずWake専用。
-     */
-    encoder_wakeup: encoder_wakeup {
-        compatible = "zmk,kscan-sideband-behaviors";
-
-        kscan = <&encoder_wakeup_scan>;
-
-        auto-enable;
-        wakeup-source;
-    };
 };
 
 /*
- * 右側を全体matrixの後半として扱う。
+ * 右側matrixを後半へ配置。
  */
 &default_transform {
     col-offset = <3>;
 };
 
 /*
- * 右ホイール
- *
- * 共有DTSのEC11定義を
- * 右XIAOでも使用する。
+ * 右Encoder
  *
  * D4 = A
  * D5 = B
