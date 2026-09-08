@@ -7,6 +7,11 @@
         zmk,kscan = &kscan0;
     };
 
+    /*
+     * 通常のキー入力
+     * D0 / D1 / D2 = Charlieplex
+     * D3 = Wake用interrupt
+     */
     kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-charlieplex";
         wakeup-source;
@@ -19,8 +24,41 @@
         interrupt-gpios =
             <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
     };
+
+    /*
+     * エンコーダー起床専用
+     *
+     * Encoder A/B
+     *    ↓ ダイオードで合流
+     * D6
+     */
+    encoder_wakeup_scan: encoder_wakeup_scan {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+
+        input-gpios =
+            <&xiao_d 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+
+    /*
+     * D6のKScanを通常keymapには流さず、
+     * Wake専用のSidebandとして有効化。
+     */
+    encoder_wakeup: encoder_wakeup {
+        compatible = "zmk,kscan-sideband-behaviors";
+
+        kscan = <&encoder_wakeup_scan>;
+
+        auto-enable;
+        wakeup-source;
+    };
 };
 
+/*
+ * 左ホイール
+ * D4 = A
+ * D5 = B
+ */
 &left_encoder {
     status = "okay";
 };
