@@ -8,14 +8,23 @@
     };
 
     kscan0: kscan_0 {
-        compatible = "zmk,kscan-gpio-direct";
+        compatible = "zmk,kscan-gpio-charlieplex";
         wakeup-source;
 
-        input-gpios =
-            <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        gpios =
+            <&xiao_d 0 GPIO_ACTIVE_HIGH>,
+            <&xiao_d 1 GPIO_ACTIVE_HIGH>,
+            <&xiao_d 2 GPIO_ACTIVE_HIGH>;
+
+        interrupt-gpios =
+            <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
     };
 };
 
+/*
+ * 右側のlocal column 0～2を
+ * 全体matrixのcolumn 3～5として扱う。
+ */
 &default_transform {
-    col-offset = <1>;
+    col-offset = <3>;
 };
