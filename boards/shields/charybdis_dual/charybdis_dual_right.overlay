@@ -7,6 +7,11 @@
         zmk,kscan = &kscan0;
     };
 
+    /*
+     * 通常のキー入力
+     * D0 / D1 / D2 = Charlieplex
+     * D3 = Wake用interrupt
+     */
     kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-charlieplex";
         wakeup-source;
@@ -19,21 +24,47 @@
         interrupt-gpios =
             <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
     };
+
+    /*
+     * エンコーダー起床専用
+     *
+     * Encoder A/B
+     *    ↓ ダイオードで合流
+     * D6
+     */
+    encoder_wakeup_scan: encoder_wakeup_scan {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+
+        input-gpios =
+            <&xiao_d 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+
+    /*
+     * D6は通常キーとして使わずWake専用。
+     */
+    encoder_wakeup: encoder_wakeup {
+        compatible = "zmk,kscan-sideband-behaviors";
+
+        kscan = <&encoder_wakeup_scan>;
+
+        auto-enable;
+        wakeup-source;
+    };
 };
 
 /*
- * 右側のlocal column 0～2を
- * 全体matrixのcolumn 3～5として扱う。
+ * 右側を全体matrixの後半として扱う。
  */
 &default_transform {
     col-offset = <3>;
 };
 
 /*
- * 右側スクロールホイール。
+ * 右ホイール
  *
- * charybdis_dual.dtsi にあるEC11定義を
- * 右XIAOでも有効化する。
+ * 共有DTSのEC11定義を
+ * 右XIAOでも使用する。
  *
  * D4 = A
  * D5 = B
