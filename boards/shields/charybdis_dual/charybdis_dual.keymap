@@ -9,8 +9,8 @@
             #sensor-binding-cells = <0>;
 
             bindings = <
-                &msc SCRL_UP
-                &msc SCRL_DOWN
+                &kp PG_UP
+                &kp PG_DN
             >;
         };
     };
