@@ -1,18 +1,18 @@
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 120
+
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
 
 / {
     behaviors {
-        encoder_scroll: encoder_scroll {
-            compatible = "zmk,behavior-sensor-rotate";
-            #sensor-binding-cells = <0>;
-            tap-ms = <20>;
+        mouse_scrl: mouse_wheel_scrl {
+            compatible = "zmk,behavior-sensor-rotate-var";
+            #sensor-binding-cells = <2>;
 
-            bindings = <
-                &msc SCRL_UP
-                &msc SCRL_DOWN
-            >;
+            bindings = <&msc>, <&msc>;
+
+            tap-ms = <10>;
         };
     };
 
@@ -30,7 +30,7 @@
             >;
 
             sensor-bindings = <
-                &encoder_scroll
+                &mouse_scrl SCRL_UP SCRL_DOWN
             >;
         };
     };
