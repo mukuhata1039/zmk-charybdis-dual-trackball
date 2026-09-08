@@ -4,22 +4,43 @@
 / {
     default_transform: keymap_transform_0 {
         compatible = "zmk,matrix-transform";
-        columns = <3>;
+
+        /*
+         * 左3列 + 右3列
+         */
+        columns = <6>;
         rows = <3>;
 
+        /*
+         * 左半分
+         * local column 0～2
+         *
+         * 右半分
+         * col-offset = 3 により
+         * local column 0～2 → global column 3～5
+         */
         map = <
+            /* LEFT */
             RC(0,1) RC(0,2)
             RC(1,0) RC(1,2)
             RC(2,0) RC(2,1)
+
+            /* RIGHT */
+            RC(0,4) RC(0,5)
+            RC(1,3) RC(1,5)
+            RC(2,3) RC(2,4)
         >;
     };
 
     physical_layout0: physical_layout_0 {
         compatible = "zmk,physical-layout";
-        display-name = "Charlieplex Test";
+        display-name = "Charlieplex Dual Test";
         transform = <&default_transform>;
     };
 
+    /*
+     * 左側スクロールホイール
+     */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
 
