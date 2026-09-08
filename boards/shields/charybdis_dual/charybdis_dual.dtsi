@@ -1,4 +1,5 @@
 #include <dt-bindings/zmk/matrix_transform.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
 
 / {
     default_transform: keymap_transform_0 {
@@ -17,6 +18,24 @@
         compatible = "zmk,physical-layout";
         display-name = "Charlieplex Test";
         transform = <&default_transform>;
+    };
+
+    left_encoder: encoder_left {
+        compatible = "alps,ec11";
+
+        a-gpios = <&xiao_d 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+
+        steps = <24>;
+
+        status = "disabled";
+    };
+
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&left_encoder>;
+
+        triggers-per-rotation = <24>;
     };
 
     chosen {
