@@ -5,13 +5,10 @@
 #include <dt-bindings/zmk/pointing.h>
 
 /*
- * 1ノッチを短時間で処理する。
+ * スクロールホイール
  *
- * 500 × 2ms / 1000 = 1
- *
- * → 2ms後にスクロール1単位を出力
- * → 3msで終了
- * → 次の出力周期(4ms)まで引っ張らない
+ * 1ノッチを即座に処理して、
+ * 高速回転してもキューを溜めない。
  */
 &msc {
     trigger-period-ms = <2>;
@@ -34,12 +31,21 @@
 
         default_layer {
             bindings = <
+                /* LEFT */
                 &kp A
                 &kp B
                 &kp C
                 &kp D
                 &kp E
                 &kp F
+
+                /* RIGHT */
+                &kp G
+                &kp H
+                &kp I
+                &kp J
+                &kp K
+                &kp L
             >;
 
             sensor-bindings = <
