@@ -1,8 +1,13 @@
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 120
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 240
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
+
+/* スクロール出力を細かい周期にする */
+&msc {
+    trigger-period-ms = <8>;
+};
 
 / {
     behaviors {
@@ -12,7 +17,11 @@
 
             bindings = <&msc>, <&msc>;
 
-            tap-ms = <30>;
+            /*
+             * 1ノッチのスクロールを約70msに分散。
+             * 1発ドンではなく、細かく連続して出す。
+             */
+            tap-ms = <70>;
         };
     };
 
