@@ -1,48 +1,120 @@
 #include "charybdis_dual.dtsi"
 
 #include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
 
 /*
- * XIAO nRF52840:
+ * ============================================================
+ * Encoder wake
  *
+ * 現在の実験配線:
  * D4 = P0.4
  * D5 = P0.5
- *
- * EC11はD4/D5にGPIO_INT_EDGE_BOTHを設定している。
- *
- * P0.4/P0.5のEDGE割り込みを通常GPIOTEではなく、
- * nRF52840の低電力GPIO SENSEで処理させる。
- *
- * BIT(4) | BIT(5)
- * 0x10   | 0x20
- *       = 0x30
+ * ============================================================
  */
+
 &gpio0 {
     sense-edge-mask = <0x30>;
 };
 
+
 /*
- * XIAO標準のI2C1もP0.4/P0.5を使う。
+ * ============================================================
+ * Trackball wake
  *
- * 今回はD4/D5をEC11専用として使うので、
- * I2C側からピン設定を変更されないよう無効化する。
+ * D10 = P1.15
+ *
+ * P1.15 = bit 15 = 0x8000
+ * ============================================================
  */
+
+&gpio1 {
+    sense-edge-mask = <0x8000>;
+};
+
+
 &i2c1 {
     status = "disabled";
 };
+
+
+/*
+ * ============================================================
+ * PMW3610 Trackball SPI
+ *
+ * 白 NCS  -> D7
+ * 緑 SCLK -> D8
+ * 青 SDIO -> D9
+ * 紫 MOT  -> D10
+ * ============================================================
+ */
+
+&pinctrl {
+    trackball_spi_default: trackball_spi_default {
+        group1 {
+            psels =
+                <NRF_PSEL(SPIM_SCK,  1, 13)>,
+                <NRF_PSEL(SPIM_MOSI, 1, 14)>,
+                <NRF_PSEL(SPIM_MISO, 1, 14)>;
+        };
+    };
+
+    trackball_spi_sleep: trackball_spi_sleep {
+        group1 {
+            psels =
+                <NRF_PSEL(SPIM_SCK,  1, 13)>,
+                <NRF_PSEL(SPIM_MOSI, 1, 14)>,
+                <NRF_PSEL(SPIM_MISO, 1, 14)>;
+
+            low-power-enable;
+        };
+    };
+};
+
+
+&spi2 {
+    status = "okay";
+    compatible = "nordic,nrf-spim";
+
+    pinctrl-0 = <&trackball_spi_default>;
+    pinctrl-1 = <&trackball_spi_sleep>;
+    pinctrl-names = "default", "sleep";
+
+    cs-gpios = <&xiao_d 7 GPIO_ACTIVE_LOW>;
+
+    trackball: trackball@0 {
+        compatible = "pixart,pmw3610";
+        status = "okay";
+        wakeup-source;
+
+        reg = <0>;
+        spi-max-frequency = <2000000>;
+
+        motion-gpios =
+            <&xiao_d 10 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        res-cpi = <1200>;
+
+        zephyr,axis-x = <INPUT_REL_X>;
+        zephyr,axis-y = <INPUT_REL_Y>;
+    };
+};
+
 
 / {
     chosen {
         zmk,kscan = &kscan0;
     };
 
+
     /*
-     * キー用Charlieplex
+     * 現在の実験用Charlieplex
      *
      * D0 / D1 / D2 = Matrix
-     * D3 = Key Wake Interrupt
+     * D3 = Wake
      */
-    kscan0: kscan_0 {
+    matrix_kscan: matrix_kscan_0 {
         compatible = "zmk,kscan-gpio-charlieplex";
         wakeup-source;
 
@@ -54,17 +126,61 @@
         interrupt-gpios =
             <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
     };
+
+
+    /*
+     * 現在のBOOTボタン
+     *
+     * D6 ---- button ---- GND
+     *
+     * 最終版ではP1.10へ移動予定
+     */
+    boot_kscan: boot_kscan_0 {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+
+        input-gpios =
+            <&xiao_d 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        debounce-press-ms = <10>;
+        debounce-release-ms = <10>;
+    };
+
+
+    kscan0: kscan_0 {
+        compatible = "zmk,kscan-composite";
+        wakeup-source;
+
+        rows = <4>;
+        columns = <3>;
+
+        matrix {
+            kscan = <&matrix_kscan>;
+        };
+
+        boot {
+            kscan = <&boot_kscan>;
+            row-offset = <3>;
+        };
+    };
+
+
+    /*
+     * 左PMW3610 → BLE split → Dongle
+     */
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        left_trackball_split: left_trackball_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+            device = <&trackball>;
+        };
+    };
 };
 
-/*
- * Encoder
- *
- * D4 = A
- * D5 = B
- *
- * 通常スクロールとdeep sleep Wakeを
- * 同じD4/D5で行う。
- */
+
 &left_encoder {
     status = "okay";
 };

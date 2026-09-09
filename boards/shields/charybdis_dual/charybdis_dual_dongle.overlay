@@ -3,34 +3,86 @@
 #include <zephyr/dt-bindings/gpio/gpio.h>
 #include <zephyr/dt-bindings/led/led.h>
 
+
 / {
     chosen {
-        zmk,kscan = &mock_kscan;
+        zmk,kscan = &kscan0;
 
-        /*
-         * ZMK RGB underglow
-         */
         zmk,underglow = &pl9823;
-
-        /*
-         * ws2812-gpio ドライバが
-         * PL9823用タイミングを取得するために指定
-         */
         zephyr,led-strip = &pl9823;
     };
 
-    mock_kscan: mock_kscan_0 {
-        compatible = "zmk,kscan-mock";
-        columns = <0>;
-        rows = <0>;
-        events = <0>;
-    };
 
     /*
+     * ========================================================
+     * ドングル専用BOOTボタン
+     *
+     * D6 ---- push button ---- GND
+     * ========================================================
+     */
+
+    boot_kscan: boot_kscan_0 {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+
+        input-gpios =
+            <&xiao_d 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        debounce-press-ms = <10>;
+        debounce-release-ms = <10>;
+    };
+
+
+    /*
+     * BOOTボタンをrow 3へ移動。
+     *
+     * dongleはcol-offset=0なので、
+     * RC(3,0) → keymapのBOOT position 12
+     */
+    kscan0: kscan_0 {
+        compatible = "zmk,kscan-composite";
+
+        rows = <4>;
+        columns = <3>;
+
+        boot {
+            kscan = <&boot_kscan>;
+            row-offset = <3>;
+        };
+    };
+
+
+    /*
+     * ========================================================
+     * 左トラックボール受信
+     * ========================================================
+     */
+
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        left_trackball_split: left_trackball_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+    };
+
+
+    left_trackball_listener: left_trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&left_trackball_split>;
+    };
+
+
+    /*
+     * ========================================================
      * 外付け PL9823-F5
      *
-     * XIAO D0 = nRF52840 P0.02
+     * XIAO D0 = P0.02
+     * ========================================================
      */
+
     pl9823: pl9823_led {
         compatible = "worldsemi,ws2812-gpio";
 
@@ -38,25 +90,12 @@
 
         chain-length = <1>;
 
-        /*
-         * PL9823 = RGB順
-         */
         color-mapping = <
             LED_COLOR_ID_RED
             LED_COLOR_ID_GREEN
             LED_COLOR_ID_BLUE
         >;
 
-        /*
-         * PL9823-F5 timing
-         *
-         * T0H = 約0.35us
-         * T0L = 約1.36us
-         * T1H = 約1.36us
-         * T1L = 約0.35us
-         *
-         * nRF52840 64MHz用
-         */
         delay-t0h = <22>;
         delay-t0l = <87>;
         delay-t1h = <87>;

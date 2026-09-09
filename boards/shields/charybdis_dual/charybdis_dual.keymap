@@ -60,7 +60,7 @@
 
 
         /*
-         * Layer 0 = BLUE
+         * Layer 0
          */
         default_layer {
             display-name = "BASE";
@@ -81,6 +81,18 @@
                 &kp J
                 &kp K
                 &kp L
+
+                /*
+                 * 専用BOOT
+                 *
+                 * position 12:
+                 * 左D6 / ドングルD6
+                 *
+                 * position 13:
+                 * 右D6
+                 */
+                &bootloader
+                &bootloader
             >;
 
             sensor-bindings = <
@@ -90,10 +102,7 @@
 
 
         /*
-         * Layer 1 = RED
-         *
-         * Bの位置だけZにして
-         * レイヤー切替確認用。
+         * Layer 1
          */
         test_layer {
             display-name = "TEST";
@@ -114,6 +123,13 @@
                 &trans
                 &trans
                 &trans
+
+                /*
+                 * どのLayerにいても
+                 * 専用BOOTボタンは有効
+                 */
+                &bootloader
+                &bootloader
             >;
 
             sensor-bindings = <
