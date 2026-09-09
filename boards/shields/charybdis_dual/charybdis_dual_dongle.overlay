@@ -1,8 +1,22 @@
 #include "charybdis_dual.dtsi"
 
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/led/led.h>
+
 / {
     chosen {
         zmk,kscan = &mock_kscan;
+
+        /*
+         * ZMK RGB underglow
+         */
+        zmk,underglow = &pl9823;
+
+        /*
+         * ws2812-gpio ドライバが
+         * PL9823用タイミングを取得するために指定
+         */
+        zephyr,led-strip = &pl9823;
     };
 
     mock_kscan: mock_kscan_0 {
@@ -10,5 +24,44 @@
         columns = <0>;
         rows = <0>;
         events = <0>;
+    };
+
+    /*
+     * 外付け PL9823-F5
+     *
+     * XIAO D0 = nRF52840 P0.02
+     */
+    pl9823: pl9823_led {
+        compatible = "worldsemi,ws2812-gpio";
+
+        gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+
+        chain-length = <1>;
+
+        /*
+         * PL9823 = RGB順
+         */
+        color-mapping = <
+            LED_COLOR_ID_RED
+            LED_COLOR_ID_GREEN
+            LED_COLOR_ID_BLUE
+        >;
+
+        /*
+         * PL9823-F5 timing
+         *
+         * T0H = 約0.35us
+         * T0L = 約1.36us
+         * T1H = 約1.36us
+         * T1L = 約0.35us
+         *
+         * nRF52840 64MHz用
+         */
+        delay-t0h = <22>;
+        delay-t0l = <87>;
+        delay-t1h = <87>;
+        delay-t1l = <22>;
+
+        reset-delay = <50>;
     };
 };
