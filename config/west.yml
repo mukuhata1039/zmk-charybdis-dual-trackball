@@ -6,10 +6,17 @@ manifest:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
 
+    - name: badjeff
+      url-base: https://github.com/badjeff
+
   projects:
     - name: zmk
       remote: zmkfirmware
       import: app/west.yml
+
+    - name: zmk-input-processor-xyz
+      remote: badjeff
+      revision: edb44b7
 
   self:
     path: config

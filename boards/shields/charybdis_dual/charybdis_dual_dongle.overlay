@@ -2,6 +2,7 @@
 
 #include <zephyr/dt-bindings/gpio/gpio.h>
 #include <zephyr/dt-bindings/led/led.h>
+#include <input/processors/xyz.dtsi>
 
 
 / {
@@ -72,6 +73,12 @@
     left_trackball_listener: left_trackball_listener {
         compatible = "zmk,input-listener";
         device = <&left_trackball_split>;
+
+        /*
+         * LEFT側で1つに圧縮されたX/Yを
+         * ここで元のX/Yイベントへ復元する。
+         */
+        input-processors = <&zip_zxy>;
     };
 
 

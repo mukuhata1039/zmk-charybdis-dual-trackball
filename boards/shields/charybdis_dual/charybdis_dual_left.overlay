@@ -2,6 +2,8 @@
 
 #include <zephyr/dt-bindings/gpio/gpio.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <input/processors.dtsi>
+#include <input/processors/xyz.dtsi>
 
 
 /*
@@ -94,7 +96,7 @@
         motion-gpios =
             <&xiao_d 10 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 
-        res-cpi = <1200>;
+        res-cpi = <3200>;
 
         zephyr,axis-x = <INPUT_REL_X>;
         zephyr,axis-y = <INPUT_REL_Y>;
@@ -176,6 +178,14 @@
             compatible = "zmk,input-split";
             reg = <0>;
             device = <&trackball>;
+
+            /*
+             * PMW3610は3200 CPIで細かく取得し、
+             * ZMK側で3/8にして実質1200 CPI相当にする。
+             *
+             * zip_xy_scalerは端数を次回へ持ち越す。
+             */
+            input-processors = <&zip_xy_scaler 3 8>, <&zip_xyz>;
         };
     };
 };
