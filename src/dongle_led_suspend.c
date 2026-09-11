@@ -36,7 +36,8 @@ static int dongle_led_usb_listener(const zmk_event_t *eh)
         return ZMK_EV_EVENT_BUBBLE;
     }
 
-    enum usb_dc_status_code usb_status = zmk_usb_get_status();
+    enum usb_dc_status_code usb_status =
+        zmk_usb_get_status();
 
 
     /*
@@ -50,6 +51,7 @@ static int dongle_led_usb_listener(const zmk_event_t *eh)
 
             bool led_is_on = false;
 
+
             /*
              * Suspend前のLED状態を保存。
              *
@@ -62,7 +64,9 @@ static int dongle_led_usb_listener(const zmk_event_t *eh)
                 restore_led_after_suspend = false;
             }
 
+
             zmk_rgb_underglow_off();
+
 
             currently_suspended = true;
         }
@@ -76,16 +80,18 @@ static int dongle_led_usb_listener(const zmk_event_t *eh)
      * USBがSuspendから復帰
      * --------------------------------------------------------
      *
-     * CONFIGURED / RESUME / SOF 等、
+     * CONFIGURED / RESUME 等、
      * Suspend以外のUSBイベントが来たら復帰扱い。
      */
     if (currently_suspended) {
 
         currently_suspended = false;
 
+
         if (restore_led_after_suspend) {
             zmk_rgb_underglow_on();
         }
+
 
         restore_led_after_suspend = false;
     }
@@ -95,5 +101,13 @@ static int dongle_led_usb_listener(const zmk_event_t *eh)
 }
 
 
-ZMK_LISTENER(dongle_led_usb, dongle_led_usb_listener);
-ZMK_SUBSCRIPTION(dongle_led_usb, zmk_usb_conn_state_changed);
+ZMK_LISTENER(
+    dongle_led_usb,
+    dongle_led_usb_listener
+);
+
+
+ZMK_SUBSCRIPTION(
+    dongle_led_usb,
+    zmk_usb_conn_state_changed
+);
