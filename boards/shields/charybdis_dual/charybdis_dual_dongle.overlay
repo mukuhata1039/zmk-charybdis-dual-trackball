@@ -70,15 +70,21 @@
     };
 
 
+    usb_suspend_xy_blocker: usb_suspend_xy_blocker {
+        compatible =
+            "zmk,input-processor-usb-suspend-blocker";
+
+        #input-processor-cells = <0>;
+    };
+
+
     left_trackball_listener: left_trackball_listener {
         compatible = "zmk,input-listener";
         device = <&left_trackball_split>;
 
-        /*
-         * LEFT側で1つに圧縮されたX/Yを
-         * ここで元のX/Yイベントへ復元する。
-         */
-        input-processors = <&zip_zxy>;
+        input-processors =
+            <&zip_zxy>,
+            <&usb_suspend_xy_blocker>;
     };
 
 

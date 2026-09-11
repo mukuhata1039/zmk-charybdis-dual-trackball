@@ -9,3 +9,8 @@ zephyr_library_sources_ifdef(
     CONFIG_ZMK_RGB_UNDERGLOW
     src/dongle_led_suspend.c
 )
+
+zephyr_library_sources_ifdef(
+    CONFIG_ZMK_USB
+    src/trackball_usb_suspend_filter.c
+)
